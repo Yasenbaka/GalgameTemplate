@@ -92,6 +92,9 @@ define config.name = _("{manifest.project.window_title}")
 define config.version = "{manifest.project.version}"
 define build.name = "{manifest.project.slug}"
 
+define config.screen_width = 1920
+define config.screen_height = 1080
+
 default phase1_save_pages = {manifest.ui.save_pages}
 default phase1_slots_per_page = {manifest.ui.slots_per_page}
 default phase1_history_length = {manifest.ui.history_length}
@@ -101,6 +104,63 @@ default phase1_history_length = {manifest.ui.history_length}
 def _render_gui(manifest: ProjectManifest) -> str:
     return f"""# Phase 1 placeholder GUI contract for {manifest.project.window_title}
 # Later visual passes can replace these styles with polished assets and transitions.
+
+init offset = -2
+
+init python:
+    gui.init(1920, 1080)
+
+# 中文字体支持
+style default:
+    font "fonts/msyh.ttc"
+
+# 对话框背景（底部黑色半透明条）
+style say_window:
+    background Solid("#000000cc")
+    xalign 0.5
+    yalign 1.0
+    xfill True
+    yminimum 220
+    padding (60, 30)
+
+# 角色名框
+style say_namebox:
+    background Solid("#2a3040")
+    xalign 0.0
+    yalign 0.0
+    padding (16, 8)
+
+style namebox:
+    background Solid("#2a3040")
+    xalign 0.0
+    yalign 0.0
+    padding (16, 8)
+
+# 角色名文字
+style say_who:
+    font "fonts/msyh.ttc"
+    color "#88ccff"
+    size 26
+    bold True
+
+# 对话文字
+style say_what:
+    font "fonts/msyh.ttc"
+    color "#ffffff"
+    size 28
+    line_spacing 8
+
+style say_label:
+    font "fonts/msyh.ttc"
+
+style say_dialogue:
+    font "fonts/msyh.ttc"
+
+style button_text:
+    font "fonts/msyh.ttc"
+
+style text:
+    font "fonts/msyh.ttc"
 
 style phase1_menu_button is default:
     padding (18, 10)
@@ -126,11 +186,13 @@ init python:
 
     def set_auto_forward_seconds(value):
         renpy.store.custom_auto_forward_seconds = float(value)
+        renpy.game.preferences.afm_time = float(value)
 
     def set_text_seconds_per_char(value):
         numeric = max(0.01, float(value))
         renpy.store.custom_seconds_per_char = numeric
         renpy.store.custom_text_cps = max(1, int(round(1.0 / numeric)))
+        renpy.game.preferences.text_cps = renpy.store.custom_text_cps
 
     def start_auto_mode():
         renpy.store.auto_mode_enabled = True
@@ -151,12 +213,21 @@ init python:
 
 def _render_characters() -> str:
     return """# Placeholder character and image declarations for the vertical slice
+# Replace image paths with your actual asset files.
 
 define narrator = Character(None)
 define hero = Character("Hero")
 
+# Example: define your characters and map them to images in images/characters/
+# define protagonist = Character("主角")
+# define sidekick = Character("夏百咲")
+
 image bg demo_room = Solid("#162033")
+# image bg meeting_room = "images/backgrounds/场景_会议室.png"
+
 image char hero default = Solid("#4f7195", xysize=(700, 1000))
+# image protagonist = "images/characters/柊春雪.png"
+# image sidekick = "images/characters/夏百咲.png"
 """
 
 
@@ -186,6 +257,37 @@ def _render_transforms() -> str:
 define bg_fade = Dissolve(0.40)
 define bg_dissolve = Dissolve(0.25)
 
+# Character positions (xalign: 0=left, 0.5=center, 1=right; yalign: 0=top, 1=bottom)
+transform pos_left:
+    xalign 0.15
+    yalign -0.02
+
+transform pos_center:
+    xalign 0.5
+    yalign -0.02
+
+transform pos_right:
+    xalign 0.85
+    yalign -0.02
+
+transform pos_far_left:
+    xalign 0.0
+    yalign -0.02
+
+transform pos_far_right:
+    xalign 1.0
+    yalign -0.02
+
+# Character scaling
+transform scale_small:
+    zoom 0.8
+    yalign 1.0
+
+transform scale_large:
+    zoom 1.2
+    yalign 1.0
+
+# Animation transforms
 transform char_move_in_left:
     xalign -0.25
     linear 0.50 xalign 0.5
@@ -208,19 +310,34 @@ def _render_main_menu() -> str:
     return """screen main_menu():
     tag menu
 
-    add Solid("#10151c")
+    # Background image fallback to solid color
+    if renpy.loadable("images/ui/main_menu_bg.png"):
+        add "images/ui/main_menu_bg.png"
+    else:
+        add Solid("#10151c")
 
+    # Game title
+    text _("你的游戏标题"):
+        xalign 0.5
+        yalign 0.25
+        size 72
+        color "#ffffff"
+        outlines [(2, "#000000", 0, 0)]
+
+    # Button area
     frame:
         xalign 0.5
-        yalign 0.5
+        yalign 0.65
+        background None
+        padding (0, 0)
 
         vbox:
-            spacing 18
+            spacing 24
 
-            textbutton _("Start") action Start()
-            textbutton _("Load") action ShowMenu("load")
-            textbutton _("Settings") action ShowMenu("preferences")
-            textbutton _("Exit") action ShowMenu("confirm_exit")
+            textbutton _("开始游戏") action Start()
+            textbutton _("读取存档") action ShowMenu("load")
+            textbutton _("游戏设置") action ShowMenu("preferences")
+            textbutton _("退出游戏") action ShowMenu("confirm_exit")
 """
 
 
@@ -237,7 +354,10 @@ def _render_hud() -> str:
                 spacing 12
 
                 textbutton _("SAVE") action ShowMenu("save")
-                textbutton _("LOAD") action ShowMenu("load")
+                imagebutton:
+                    idle "images/ui/LOAD.png"
+                    hover "images/ui/LOAD.png"
+                    action ShowMenu("load")
                 textbutton _("CONFIG") action ShowMenu("preferences")
                 textbutton _("EXIT") action ShowMenu("confirm_exit")
                 textbutton _("History") action ShowMenu("history_log")
@@ -260,25 +380,65 @@ screen load():
 screen file_slot_grid(mode):
     default total_slots = {manifest.ui.save_slot_count}
 
-    viewport:
-        scrollbars "vertical"
-        mousewheel True
+    # Semi-transparent black background overlay
+    frame:
+        background "#000000cc"
+        xfill True
+        yfill True
 
-        grid 1 total_slots:
-            spacing 8
+        # Centered panel
+        frame:
+            xalign 0.5
+            yalign 0.5
+            xsize 900
+            ysize 700
+            background "#1a1f2ecc"
+            padding (20, 20)
 
-            for slot_index in range(1, total_slots + 1):
-                $ slot_name = str(slot_index)
+            vbox:
+                spacing 12
 
-                button:
-                    if mode == "save":
-                        action Function(save_or_confirm, slot_name)
-                    else:
-                        action FileAction(slot_name)
+                # Title
+                if mode == "save":
+                    text _("保存游戏") xalign 0.5 size 32
+                else:
+                    text _("读取游戏") xalign 0.5 size 32
 
-                    vbox:
-                        text _("Slot {{slot}}".format(slot=slot_index))
-                        text FileTime(slot_name, format="%Y-%m-%d %H:%M", empty=_('Empty'))
+                # Save slot list
+                viewport:
+                    scrollbars "vertical"
+                    mousewheel True
+                    xfill True
+                    yfill True
+
+                    grid 1 total_slots:
+                        spacing 8
+                        xfill True
+
+                        for slot_index in range(1, total_slots + 1):
+                            $ slot_name = str(slot_index)
+
+                            button:
+                                xfill True
+                                yminimum 80
+                                background "#2a3040"
+                                hover_background "#3a5070"
+
+                                if mode == "save":
+                                    action Function(save_or_confirm, slot_name)
+                                else:
+                                    action FileAction(slot_name)
+
+                                hbox:
+                                    spacing 20
+                                    xfill True
+                                    yalign 0.5
+
+                                    text _("存档 {{slot}}".format(slot=slot_index)) size 24
+                                    text FileTime(slot_name, format="%Y-%m-%d %H:%M", empty=_("空槽位")) size 20 color "#888888"
+
+                # Return button
+                textbutton _("返回") action Return() xalign 0.5
 """
 
 
@@ -286,22 +446,75 @@ def _render_preferences() -> str:
     return """screen preferences():
     tag menu
 
+    # Semi-transparent black background overlay
     frame:
-        xalign 0.5
-        yalign 0.5
+        background "#000000cc"
+        xfill True
+        yfill True
 
-        vbox:
-            spacing 12
+        # Centered panel
+        frame:
+            xalign 0.5
+            yalign 0.5
+            xsize 700
+            ysize 600
+            background "#1a1f2ecc"
+            padding (30, 30)
 
-            bar value Preference("music volume")
-            bar value Preference("voice volume")
-            bar value Preference("sound volume")
+            vbox:
+                spacing 20
+                xfill True
 
-            bar value VariableValue("custom_auto_forward_seconds", 1.0, 30.0, step=0.5)
-            bar value VariableValue("custom_seconds_per_char", 0.01, 0.50, step=0.01)
+                text _("游戏设置") xalign 0.5 size 32
 
-            textbutton _("Apply Auto Speed") action Function(set_auto_forward_seconds, custom_auto_forward_seconds)
-            textbutton _("Apply Text Speed") action Function(set_text_seconds_per_char, custom_seconds_per_char)
+                # Volume settings
+                text _("音量") size 24
+
+                hbox:
+                    spacing 12
+                    yalign 0.5
+                    text _("背景音乐") xsize 120
+                    bar value Preference("music volume") xfill True
+
+                hbox:
+                    spacing 12
+                    yalign 0.5
+                    text _("人物配音") xsize 120
+                    bar value Preference("voice volume") xfill True
+
+                hbox:
+                    spacing 12
+                    yalign 0.5
+                    text _("界面音效") xsize 120
+                    bar value Preference("sound volume") xfill True
+
+                null height 20
+
+                # Speed settings
+                text _("速度") size 24
+
+                hbox:
+                    spacing 12
+                    yalign 0.5
+                    text _("自动播放") xsize 120
+                    bar value VariableValue("custom_auto_forward_seconds", 1.0, 30.0, step=0.5) xfill True
+                    text "[custom_auto_forward_seconds:.1f] 秒" xsize 80
+
+                hbox:
+                    spacing 12
+                    yalign 0.5
+                    text _("文字显示") xsize 120
+                    bar value VariableValue("custom_seconds_per_char", 0.01, 0.50, step=0.01) xfill True
+                    text "[custom_seconds_per_char:.2f] 秒/字" xsize 100
+
+                null height 30
+
+                # Apply buttons
+                hbox:
+                    spacing 20
+                    xalign 0.5
+                    textbutton _("应用") action [Function(set_auto_forward_seconds, custom_auto_forward_seconds), Function(set_text_seconds_per_char, custom_seconds_per_char)]
+                    textbutton _("返回") action Return() xalign 0.5
 """
 
 
@@ -309,18 +522,55 @@ def _render_history(manifest: ProjectManifest) -> str:
     return f"""screen history_log():
     tag menu
 
+    # Semi-transparent black background overlay
     frame:
-        xalign 0.5
-        yalign 0.5
+        background "#000000cc"
+        xfill True
+        yfill True
 
-        viewport:
-            scrollbars "vertical"
-            mousewheel True
-            draggable True
+        # Centered panel
+        frame:
+            xalign 0.5
+            yalign 0.5
+            xsize 900
+            ysize 700
+            background "#1a1f2ecc"
+            padding (30, 30)
 
             vbox:
-                for history_entry in _history_list[-{manifest.ui.history_length}:]:
-                    text history_entry.what
+                spacing 16
+                xfill True
+
+                text _("历史记录") xalign 0.5 size 32
+
+                # History list
+                viewport:
+                    scrollbars "vertical"
+                    mousewheel True
+                    draggable True
+                    xfill True
+                    yfill True
+
+                    vbox:
+                        spacing 10
+                        xfill True
+
+                        if _history_list:
+                            for history_entry in _history_list[-{manifest.ui.history_length}:]:
+                                hbox:
+                                    spacing 8
+                                    xfill True
+
+                                    if history_entry.who:
+                                        text "[history_entry.who]" size 20 color "#88ccff" yalign 0.0
+                                    else:
+                                        text _("旁白") size 20 color "#888888" yalign 0.0
+
+                                    text ": [history_entry.what]" size 20 color "#dddddd"
+                        else:
+                            text _("暂无历史记录") xalign 0.5 color "#888888"
+
+                textbutton _("返回") action Return() xalign 0.5
 """
 
 
@@ -359,6 +609,8 @@ screen confirm_save_overwrite(slot_name):
 
 def _render_prologue() -> str:
     return """label start:
+    show screen game_hud
+
     scene bg demo_room with bg_fade
     show char hero default at char_move_in_left
 

@@ -12,3 +12,4 @@ build/
 out/
 build_artifacts/
 renpy-sdk-path.txt
+asset/
