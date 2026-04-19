@@ -1,0 +1,11 @@
+[project]
+name = "Phase1Demo"
+version = "0.1.0"
+window_title = "Phase 1 Demo"
+
+[ui]
+save_pages = 5
+slots_per_page = 10
+default_auto_forward_seconds = 10.0
+default_seconds_per_char = 0.1
+history_length = 250
