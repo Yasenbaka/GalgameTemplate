@@ -165,6 +165,11 @@ style text:
 style phase1_menu_button is default:
     padding (18, 10)
 
+# Image button style with sound effects
+style imagebutton:
+    activate_sound "audio/sfx/ui_click.wav"
+    hover_sound "audio/sfx/ui_hover.wav"
+
 transform hover_pulse:
     linear 0.10 zoom 1.03
     linear 0.10 zoom 1.0
@@ -334,10 +339,22 @@ def _render_main_menu() -> str:
         vbox:
             spacing 24
 
-            textbutton _("开始游戏") action Start()
-            textbutton _("读取存档") action ShowMenu("load")
-            textbutton _("游戏设置") action ShowMenu("preferences")
-            textbutton _("退出游戏") action ShowMenu("confirm_exit")
+            imagebutton:
+                idle "images/ui/start_game.png"
+                hover "images/ui/start_game.png"
+                action Start()
+            imagebutton:
+                idle "images/ui/load_game.png"
+                hover "images/ui/load_game.png"
+                action ShowMenu("load")
+            imagebutton:
+                idle "images/ui/settings.png"
+                hover "images/ui/settings.png"
+                action ShowMenu("preferences")
+            imagebutton:
+                idle "images/ui/exit_game.png"
+                hover "images/ui/exit_game.png"
+                action ShowMenu("confirm_exit")
 """
 
 
@@ -348,21 +365,39 @@ def _render_hud() -> str:
     if not interface_hidden:
         frame:
             xalign 0.5
-            yalign 0.96
+            yalign 1.0
 
             hbox:
                 spacing 12
 
-                textbutton _("SAVE") action ShowMenu("save")
+                imagebutton:
+                    idle "images/ui/SAVE.png"
+                    hover "images/ui/SAVE.png"
+                    action ShowMenu("save")
                 imagebutton:
                     idle "images/ui/LOAD.png"
                     hover "images/ui/LOAD.png"
                     action ShowMenu("load")
-                textbutton _("CONFIG") action ShowMenu("preferences")
-                textbutton _("EXIT") action ShowMenu("confirm_exit")
-                textbutton _("History") action ShowMenu("history_log")
-                textbutton _("Auto") action Function(start_auto_mode)
-                textbutton _("Pause") action Function(stop_auto_mode)
+                imagebutton:
+                    idle "images/ui/config.png"
+                    hover "images/ui/config.png"
+                    action ShowMenu("preferences")
+                imagebutton:
+                    idle "images/ui/EXIT.png"
+                    hover "images/ui/EXIT.png"
+                    action ShowMenu("confirm_exit")
+                imagebutton:
+                    idle "images/ui/history.png"
+                    hover "images/ui/history.png"
+                    action ShowMenu("history_log")
+                imagebutton:
+                    idle "images/ui/auto.png"
+                    hover "images/ui/auto.png"
+                    action Function(start_auto_mode)
+                imagebutton:
+                    idle "images/ui/pause.png"
+                    hover "images/ui/pause.png"
+                    action Function(stop_auto_mode)
 """
 
 
@@ -438,7 +473,11 @@ screen file_slot_grid(mode):
                                     text FileTime(slot_name, format="%Y-%m-%d %H:%M", empty=_("空槽位")) size 20 color "#888888"
 
                 # Return button
-                textbutton _("返回") action Return() xalign 0.5
+                imagebutton:
+                    idle "images/ui/back.png"
+                    hover "images/ui/back.png"
+                    action Return()
+                    xalign 0.5
 """
 
 
@@ -513,8 +552,14 @@ def _render_preferences() -> str:
                 hbox:
                     spacing 20
                     xalign 0.5
-                    textbutton _("应用") action [Function(set_auto_forward_seconds, custom_auto_forward_seconds), Function(set_text_seconds_per_char, custom_seconds_per_char)]
-                    textbutton _("返回") action Return() xalign 0.5
+                    imagebutton:
+                        idle "images/ui/apply.png"
+                        hover "images/ui/apply.png"
+                        action [Function(set_auto_forward_seconds, custom_auto_forward_seconds), Function(set_text_seconds_per_char, custom_seconds_per_char)]
+                    imagebutton:
+                        idle "images/ui/back.png"
+                        hover "images/ui/back.png"
+                        action Return()
 """
 
 
@@ -570,7 +615,11 @@ def _render_history(manifest: ProjectManifest) -> str:
                         else:
                             text _("暂无历史记录") xalign 0.5 color "#888888"
 
-                textbutton _("返回") action Return() xalign 0.5
+                imagebutton:
+                    idle "images/ui/back.png"
+                    hover "images/ui/back.png"
+                    action Return()
+                    xalign 0.5
 """
 
 
@@ -586,8 +635,16 @@ def _render_confirm() -> str:
             spacing 12
 
             text _("Exit the game?")
-            textbutton _("Exit") action Quit(confirm=False)
-            textbutton _("Cancel") action Hide("confirm_exit")
+            hbox:
+                spacing 12
+                imagebutton:
+                    idle "images/ui/confirm.png"
+                    hover "images/ui/confirm.png"
+                    action Quit(confirm=False)
+                imagebutton:
+                    idle "images/ui/cancel.png"
+                    hover "images/ui/cancel.png"
+                    action Hide("confirm_exit")
 
 
 screen confirm_save_overwrite(slot_name):
@@ -602,8 +659,16 @@ screen confirm_save_overwrite(slot_name):
 
             text _("Overwrite")
             text _("Overwrite save slot [slot_name]?")
-            textbutton _("Overwrite") action [Function(overwrite_save, slot_name), Hide("confirm_save_overwrite")]
-            textbutton _("Cancel") action Hide("confirm_save_overwrite")
+            hbox:
+                spacing 12
+                imagebutton:
+                    idle "images/ui/overwrite.png"
+                    hover "images/ui/overwrite.png"
+                    action [Function(overwrite_save, slot_name), Hide("confirm_save_overwrite")]
+                imagebutton:
+                    idle "images/ui/cancel.png"
+                    hover "images/ui/cancel.png"
+                    action Hide("confirm_save_overwrite")
 """
 
 

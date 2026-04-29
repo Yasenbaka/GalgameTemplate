@@ -21,6 +21,10 @@ style button_text:
     idle_color gui.idle_color
     hover_color gui.hover_color
 
+style imagebutton:
+    activate_sound "audio/sfx/ui_click.wav"
+    hover_sound "audio/sfx/ui_hover.wav"
+
 style say_window:
     background Frame(Solid("#0F172ACC"), 18, 18)
     xfill True

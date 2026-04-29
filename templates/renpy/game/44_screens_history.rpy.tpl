@@ -28,4 +28,7 @@ screen history_log():
                         $ speaker = entry.who if entry.who else "Narrator"
                         text "[speaker]: [entry.what]"
 
-        textbutton _("Back") action [Function(safe_play_ui_sound), Return()]
+        imagebutton:
+            idle "images/ui/back.png"
+            hover "images/ui/back.png"
+            action [Function(safe_play_ui_sound), Return()]

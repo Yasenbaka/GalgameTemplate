@@ -40,10 +40,18 @@ screen preferences():
             bar value VariableValue("custom_seconds_per_char", 1.0, offset=0.01, step=0.01)
             text "[custom_seconds_per_char:.2f]"
 
-        textbutton _("Apply Timing") action [
-            Function(safe_play_ui_sound),
-            Function(set_auto_forward_seconds, custom_auto_forward_seconds),
-            Function(set_text_seconds_per_char, custom_seconds_per_char),
-        ]
-
-        textbutton _("Back") action [Function(safe_play_ui_sound), Return()]
+        hbox:
+            spacing 12
+            xalign 0.5
+            imagebutton:
+                idle "images/ui/apply.png"
+                hover "images/ui/apply.png"
+                action [
+                    Function(safe_play_ui_sound),
+                    Function(set_auto_forward_seconds, custom_auto_forward_seconds),
+                    Function(set_text_seconds_per_char, custom_seconds_per_char),
+                ]
+            imagebutton:
+                idle "images/ui/back.png"
+                hover "images/ui/back.png"
+                action [Function(safe_play_ui_sound), Return()]

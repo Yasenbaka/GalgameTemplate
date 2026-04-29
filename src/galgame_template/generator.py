@@ -6,7 +6,7 @@ import shutil
 import sys
 from pathlib import Path
 
-from .constants import DEFAULT_OUTPUT_ROOT_NAME
+from .constants import DEFAULT_OUTPUT_ROOT_NAME, FUTURE_TEMPLATE_ROOT
 from .manifest import ProjectManifest, load_manifest
 from .render import build_render_plan, write_render_plan
 
@@ -58,6 +58,22 @@ def _copy_fonts(project_root: Path) -> None:
     print(f"Copied system font: {font_source} -> {font_dest}")
 
 
+def _copy_ui_images(project_root: Path) -> None:
+    """Copy UI placeholder images from templates into the generated project."""
+    template_ui_dir = FUTURE_TEMPLATE_ROOT / "images" / "ui"
+    if not template_ui_dir.exists():
+        print("warning: No UI image templates found. UI buttons may not display correctly.", file=sys.stderr)
+        return
+
+    output_ui_dir = project_root / "game" / "images" / "ui"
+    output_ui_dir.mkdir(parents=True, exist_ok=True)
+
+    for image_file in template_ui_dir.glob("*.png"):
+        dest = output_ui_dir / image_file.name
+        shutil.copy2(image_file, dest)
+        print(f"Copied UI image: {image_file.name}")
+
+
 def generate_project(
     manifest: ProjectManifest | str | Path,
     output_root: str | Path | None = None,
@@ -77,4 +93,5 @@ def generate_project(
     project_root.mkdir(parents=True, exist_ok=True)
     write_render_plan(project_root, build_render_plan(resolved_manifest), force=force)
     _copy_fonts(project_root)
+    _copy_ui_images(project_root)
     return project_root

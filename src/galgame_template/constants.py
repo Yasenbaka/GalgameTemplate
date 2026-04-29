@@ -13,6 +13,7 @@ GENERATED_README_NAME = "README.generated.md"
 ASSET_DIRECTORIES = (
     Path("game/images/backgrounds"),
     Path("game/images/characters"),
+    Path("game/images/ui"),
     Path("game/audio/music"),
     Path("game/audio/sfx"),
     Path("game/audio/voice"),

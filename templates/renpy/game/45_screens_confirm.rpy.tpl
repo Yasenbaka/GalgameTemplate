@@ -15,8 +15,14 @@ screen confirm_exit():
 
         hbox:
             spacing 12
-            textbutton _("Cancel") action [Function(safe_play_ui_sound), Hide("confirm_exit")]
-            textbutton _("Exit") action [Function(safe_play_ui_sound), Quit(confirm=False)]
+            imagebutton:
+                idle "images/ui/cancel.png"
+                hover "images/ui/cancel.png"
+                action [Function(safe_play_ui_sound), Hide("confirm_exit")]
+            imagebutton:
+                idle "images/ui/confirm.png"
+                hover "images/ui/confirm.png"
+                action [Function(safe_play_ui_sound), Quit(confirm=False)]
 
 screen confirm_save_overwrite(slot_name):
     modal True
@@ -35,5 +41,11 @@ screen confirm_save_overwrite(slot_name):
 
         hbox:
             spacing 12
-            textbutton _("Cancel") action [Function(safe_play_ui_sound), Hide("confirm_save_overwrite")]
-            textbutton _("Overwrite") action [Function(safe_play_ui_sound), Function(force_save_to_slot, slot_name)]
+            imagebutton:
+                idle "images/ui/cancel.png"
+                hover "images/ui/cancel.png"
+                action [Function(safe_play_ui_sound), Hide("confirm_save_overwrite")]
+            imagebutton:
+                idle "images/ui/overwrite.png"
+                hover "images/ui/overwrite.png"
+                action [Function(safe_play_ui_sound), Function(force_save_to_slot, slot_name)]

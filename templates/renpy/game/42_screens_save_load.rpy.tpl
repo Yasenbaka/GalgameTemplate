@@ -40,7 +40,10 @@ screen file_manager(mode):
         use slot_pages
         use file_slot_grid(mode)
 
-        textbutton _("Back") action [Function(safe_play_ui_sound), Return()]
+        imagebutton:
+            idle "images/ui/back.png"
+            hover "images/ui/back.png"
+            action [Function(safe_play_ui_sound), Return()]
 
 screen save():
     use file_manager("save")
