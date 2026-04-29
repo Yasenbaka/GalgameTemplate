@@ -26,11 +26,12 @@ def build_render_plan(manifest: ProjectManifest) -> tuple[RenderedFile, ...]:
         RenderedFile(Path("game") / "20_audio.rpy", _render_audio()),
         RenderedFile(Path("game") / "30_transforms.rpy", _render_transforms()),
         RenderedFile(Path("game") / "40_screens_main_menu.rpy", _render_main_menu()),
-        RenderedFile(Path("game") / "41_screens_hud.rpy", _render_hud()),
-        RenderedFile(Path("game") / "42_screens_save_load.rpy", _render_save_load(manifest)),
-        RenderedFile(Path("game") / "43_screens_preferences.rpy", _render_preferences()),
-        RenderedFile(Path("game") / "44_screens_history.rpy", _render_history(manifest)),
-        RenderedFile(Path("game") / "45_screens_confirm.rpy", _render_confirm()),
+        RenderedFile(Path("game") / "41_screens_say.rpy", _render_say(manifest)),
+        RenderedFile(Path("game") / "42_screens_hud.rpy", _render_hud()),
+        RenderedFile(Path("game") / "43_screens_save_load.rpy", _render_save_load(manifest)),
+        RenderedFile(Path("game") / "44_screens_preferences.rpy", _render_preferences()),
+        RenderedFile(Path("game") / "45_screens_history.rpy", _render_history(manifest)),
+        RenderedFile(Path("game") / "46_screens_confirm.rpy", _render_confirm()),
         RenderedFile(Path("game") / "50_script_prologue.rpy", _render_prologue()),
         *(RenderedFile(path / ".gitkeep", "") for path in ASSET_DIRECTORIES),
     )
@@ -114,9 +115,9 @@ init python:
 style default:
     font "fonts/msyh.ttc"
 
-# 对话框背景（底部黑色半透明条）
+# 对话框背景（使用 textbox.png 图片）
 style say_window:
-    background Solid("#000000cc")
+    background Frame("images/ui/textbox.png", 60, 30, 60, 30)
     xalign 0.5
     yalign 1.0
     xfill True
@@ -140,21 +141,25 @@ style namebox:
 style say_who:
     font "fonts/msyh.ttc"
     color "#88ccff"
-    size 26
+    size {manifest.ui.name_text_size if hasattr(manifest.ui, 'name_text_size') else 26}
     bold True
 
 # 对话文字
 style say_what:
     font "fonts/msyh.ttc"
     color "#ffffff"
-    size 28
+    size {manifest.ui.dialogue_text_size if hasattr(manifest.ui, 'dialogue_text_size') else 28}
     line_spacing 8
 
 style say_label:
     font "fonts/msyh.ttc"
+    color "#88ccff"
+    size {manifest.ui.name_text_size if hasattr(manifest.ui, 'name_text_size') else 26}
 
 style say_dialogue:
     font "fonts/msyh.ttc"
+    color "#ffffff"
+    size {manifest.ui.dialogue_text_size if hasattr(manifest.ui, 'dialogue_text_size') else 28}
 
 style button_text:
     font "fonts/msyh.ttc"
@@ -355,6 +360,30 @@ def _render_main_menu() -> str:
                 idle "images/ui/exit_game.png"
                 hover "images/ui/exit_game.png"
                 action ShowMenu("confirm_exit")
+"""
+
+
+def _render_say(manifest: ProjectManifest) -> str:
+    return f"""screen say(who, what):
+    style_prefix "say"
+
+    key "mouseup_3" action Function(toggle_interface)
+
+    if not interface_hidden:
+        window:
+            id "window"
+            style "say_window"
+
+            has vbox
+            spacing 12
+
+            if who is not None:
+                window:
+                    id "namebox"
+                    style "namebox"
+                    text who id "who" style "say_label"
+
+            text what id "what" style "say_dialogue" slow_cps custom_text_cps
 """
 
 

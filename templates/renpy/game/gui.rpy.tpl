@@ -26,7 +26,7 @@ style imagebutton:
     hover_sound "audio/sfx/ui_hover.wav"
 
 style say_window:
-    background Frame(Solid("#0F172ACC"), 18, 18)
+    background Frame("images/ui/textbox.png", 60, 30, 60, 30)
     xfill True
     ysize 260
 

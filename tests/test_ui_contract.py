@@ -20,11 +20,12 @@ class UiContractTests(unittest.TestCase):
             project_root = generate_project(manifest_path, temp_dir)
 
             main_menu = (project_root / "game" / "40_screens_main_menu.rpy").read_text(encoding="utf-8")
-            hud = (project_root / "game" / "41_screens_hud.rpy").read_text(encoding="utf-8")
-            save_load = (project_root / "game" / "42_screens_save_load.rpy").read_text(encoding="utf-8")
-            preferences = (project_root / "game" / "43_screens_preferences.rpy").read_text(encoding="utf-8")
-            history = (project_root / "game" / "44_screens_history.rpy").read_text(encoding="utf-8")
-            confirm = (project_root / "game" / "45_screens_confirm.rpy").read_text(encoding="utf-8")
+            say = (project_root / "game" / "41_screens_say.rpy").read_text(encoding="utf-8")
+            hud = (project_root / "game" / "42_screens_hud.rpy").read_text(encoding="utf-8")
+            save_load = (project_root / "game" / "43_screens_save_load.rpy").read_text(encoding="utf-8")
+            preferences = (project_root / "game" / "44_screens_preferences.rpy").read_text(encoding="utf-8")
+            history = (project_root / "game" / "45_screens_history.rpy").read_text(encoding="utf-8")
+            confirm = (project_root / "game" / "46_screens_confirm.rpy").read_text(encoding="utf-8")
 
         self.assertIn('screen main_menu():', main_menu)
         self.assertIn('imagebutton', main_menu)
@@ -32,6 +33,10 @@ class UiContractTests(unittest.TestCase):
         self.assertIn('images/ui/load_game.png', main_menu)
         self.assertIn('images/ui/settings.png', main_menu)
         self.assertIn('images/ui/exit_game.png', main_menu)
+
+        self.assertIn('screen say(who, what):', say)
+        self.assertIn('style "say_window"', say)
+        self.assertIn('custom_text_cps', say)
 
         self.assertIn('key "mouseup_3" action Function(toggle_interface)', hud)
         self.assertIn('imagebutton', hud)
